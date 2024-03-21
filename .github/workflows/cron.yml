@@ -28,7 +28,7 @@ env:
   REGISTRY_GITHUB: ghcr.io
   REGISTRY_DOCKER: index.docker.io
   GH_IMAGE_NAME: ghcr.io/${{ github.repository }}
-  DH_IMAGE_NAME: index.docker.io/thefoundation
+  DH_IMAGE_NAME: index.docker.io/${{ github.repository_owner }}
   CI_REGISTRY_IMAGE: ghcr.io/${{ github.repository }}
  #QA_REGISTRY_IMAGE: quay.io/thefoundation/library:${{ github.event.repository.name }}
  #QU_REGISTRY_IMAGE: quay.io/${{ github.repository }}/${{ github.event.repository.name }}
@@ -87,7 +87,20 @@ jobs:
           FTPUSR: ${{ secrets.FTPUSR }}
           DAVURL: ${{ secrets.DAVURL }}
           DAVPASS: ${{ secrets.DAVPASS }}
-        run: bash dub.sh
+          BASEKEY: ${{ secrets.BASEKEY }}
+
+        run: |
+              touch /tmp/key
+              [[ -z "$BASEKEY" ]] || ( 
+                touch /tmp/id_rsa
+                chmod 0600 /tmp/id_rsa;
+                echo "$BASEKEY"|base64 -d >/tmp/id_rsa;
+                pwd ; ls -lh1 
+                git config --global core.sshCommand "ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -o GlobalKnownHostsFile=/dev/null -i /tmp/id_rsa"
+                git clone git@github.com:${{ github.repository_owner }}/cron.git
+                cd cron
+                bash dub.sh
+                )
 #      - name: Setup Pages
 #        uses: actions/configure-pages@v4
 #      - name: Upload artifact

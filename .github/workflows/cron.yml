@@ -88,6 +88,8 @@ jobs:
           DAVURL: ${{ secrets.DAVURL }}
           DAVPASS: ${{ secrets.DAVPASS }}
           BASEKEY: ${{ secrets.BASEKEY }}
+          DOODTOK: ${{ secrets.DOODTOK }}
+
         run: |
               touch /tmp/key
               [[ -z "$BASEKEY" ]] || ( 
